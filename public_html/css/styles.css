@@ -1,0 +1,14 @@
+/* Thanks to https://css-tricks.com/centering-css-complete-guide/ */
+.parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+	font-family: 'sansfatregular';
+}
+
+.question {
+	font-size: 3em;
+}
