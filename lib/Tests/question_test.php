@@ -1,8 +1,9 @@
 <?php
 
 require_once __DIR__ . '/../Earthling/Survey/Question.class.php';
+require_once __DIR__ . '/../Earthling/Survey/QuestionsUtil.class.php';
 
-$qid = Earthling\Survey\Question::AdminAdd('What is the weather like today?');
+$qid = Earthling\Survey\QuestionsUtil::AdminAdd('Rate your front-end experience:');
 
 if ($qid === false) {
 	echo 'Question already added, aborting test';
@@ -13,9 +14,12 @@ var_dump($qid);
 
 $question = new Earthling\Survey\Question($qid);
 
-$question->adminAddAnswer('Cold', 1);
-$question->adminAddAnswer('Breezy', 2);
-$question->adminAddAnswer('Hot', 3);
+$question->adminAddAnswer('0/5', 1);
+$question->adminAddAnswer('1/5', 2);
+$question->adminAddAnswer('2/5', 3);
+$question->adminAddAnswer('3/5', 4);
+$question->adminAddAnswer('4/5', 5);
+$question->adminAddAnswer('5/5', 6);
 
 echo $question->getId() . ' ' . $question->getText();
 

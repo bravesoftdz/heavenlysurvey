@@ -2,67 +2,11 @@
 
 namespace Earthling\Survey;
 
+require_once __DIR__ . '/QuestionsUtil.class.php';
+
 require_once __DIR__ . '/../../db.class.php';
 
 class Question {
-
-	//Static Utility Funcitons
-
-	public static function AdminDeleteAll() {
-		$prep = \db::pdo()->prepare('DELETE FROM questions ');
-		$res1 = $prep->execute(array());
-
-		$prep = \db::pdo()->prepare('DELETE FROM answers');
-		$res2 = $prep->execute(array());
-		return $res1 && $res2;
-	}
-
-	/**
-	 * Add a question to the database
-	 */
-	public static function AdminAdd($question_text) {
-		if (self::FetchByText($question_text)) {
-			return false; //already added to database
-		}
-		$prep = \db::pdo()->prepare('INSERT INTO questions (question_text) VALUES (:question_text) ');
-		$prep->execute(array(':question_text' => $question_text));
-		return \db::pdo()->lastInsertId();
-	}
-
-	/**
-	 * Fetch a given question by the question text
-	 */
-	public static function FetchByText($question_text) {
-		try {
-			$prep = \db::pdo()->prepare('SELECT id, question_text FROM questions WHERE question_text = :question_text');
-			$prep->execute(array(':question_text' => $question_text));
-			return $prep->fetch(\PDO::FETCH_ASSOC);
-
-		} catch (PDOException $e) {
-			//last_error = $e->getMessage();
-			return false;
-		}
-	}
-
-	/**
-	 * Find the question from the answer id, good to verify that the answer is actually a part of the question
-	 */
-	public static function FetchQuestionFromAnswerId($answer_id) {
-		try {
-			$prep = \db::pdo()->prepare('SELECT questions.id, question_text, question_id FROM answers
-					JOIN questions ON answers.question_id = questions.id
-					WHERE answers.id = :answer_id');
-			$prep->execute(array(':answer_id' => $answer_id));
-			return $prep->fetch(\PDO::FETCH_ASSOC);
-
-		} catch (PDOException $e) {
-			//last_error = $e->getMessage();
-			return false;
-		}
-	}
-
-	// Regular class members
-
 	private $id = null;
 	private $last_error = null;
 	private $row = null;
@@ -72,6 +16,10 @@ class Question {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+	public function isValid() {
+		return !is_null($this->id);
 	}
 
 	public function getText() {
@@ -142,6 +90,35 @@ class Question {
 	}
 
 	/**
+	 * Get user answer statistics
+	 */
+	public function userAnswerStatistics() {
+		$answers = $this->fetchAnswers();
+		$stats = array('q' => $this->getId(), 'answers' => [], );
+		$total = 0;
+		foreach ($answers as $a) {
+			$prep = \db::pdo()->prepare('SELECT COUNT(*) FROM user_answers WHERE answer_id = :answer_id');
+			$params = [':answer_id' => $a['id']];
+			$prep->execute($params);
+			$stats['answers'][$a['id']] = ['votes' => $prep->fetchColumn(), 'percent' => 0];
+
+			$total += $stats['answers'][$a['id']]['votes'];
+		}
+		$stats['total_votes'] = $total;
+
+		$total_percent = 0;
+
+		foreach ($stats['answers'] as $a_id => &$stat_answer) {
+			$stat_answer['percent'] = round(($stat_answer['votes'] / $total) * 100);
+			$total_percent += $stat_answer['percent'];
+		}
+
+		$stats['total_percent'] = $total_percent;
+
+		return $stats;
+	}
+
+	/**
 	 * Add an answer to this question
 	 */
 	public function adminAddAnswer($answer_text, $sort_order = 1) {
@@ -164,7 +141,7 @@ class Question {
 	 */
 	public function addUserAnswer($answer_id, $ip = null, $user_agent = null) {
 		try {
-			$question = self::FetchQuestionFromAnswerId($answer_id);
+			$question = QuestionsUtil::FetchQuestionFromAnswerId($answer_id);
 			if (empty($question)) {
 				//no question found
 				return false;
@@ -180,10 +157,11 @@ class Question {
 				$user_agent = $_SERVER['HTTP_USER_AGENT'];
 			}
 
-			$usr = $prep->execute(array('answer_id' => $answer_id, 'date_answered' => strtotime('now'), 'user_agent' => $user_agent,
+			$res = $prep->execute(array('answer_id' => $answer_id, 'date_answered' => strtotime('now'), 'user_agent' => $user_agent,
 				'ip' => $ip));
+			return $res;
 		} catch (PDOException $e) {
-			self::$last_error = $e->getMessage();
+			$this->last_error = $e->getMessage();
 			return false;
 		}
 	}
