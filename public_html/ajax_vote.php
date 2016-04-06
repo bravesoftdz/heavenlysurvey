@@ -12,7 +12,7 @@ $DISABLE_COOKIE_CHECK = false;
 require_once(__DIR__ . '/../lib/autoloader.inc.php');
 
 if (empty($_REQUEST['question'])){
-	die(json_encode(['error'=>'No question specified'));
+	die(json_encode(['error'=>'No question specified']));
 }
 
 $question = new Earthling\Survey\Question($_REQUEST['question']);
