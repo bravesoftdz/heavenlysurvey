@@ -1,4 +1,4 @@
--- Run these create statements inside of Sqlite --
+-- Run these create statements inside of Sqlite file db/survey.sqlite3 --
 
 -- ------------------------------------------------------------------------
 -- This table is meant for all the questions in the database
