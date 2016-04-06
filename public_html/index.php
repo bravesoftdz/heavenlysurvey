@@ -40,7 +40,6 @@ if (empty($_COOKIE['question_' . $question->getId()])) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Survey</title>
         <link rel="stylesheet" href="css/styles.css">
-        <link rel="stylesheet" href="css/fontface.css">
         <link rel="author" href="humans.txt">
     </head>
     <body class="parent">
