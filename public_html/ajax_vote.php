@@ -6,20 +6,20 @@
  *     c) Return the results of the poll in json {success: 1, already_voted: '', cookie_set: true, cookie_value: '12', 'question_text', {q:32, answers: [{12: {votes: 152, percent: '14'}}, {13: {votes: 23, percent: 5}}, ... ], total_votes: 3356}
  */
 
-$DISABLE_COOKIE_CHECK = true;
+//Turn this on to disable checking for cookie
+$DISABLE_COOKIE_CHECK = false;
 
-require_once __DIR__ . '/../../lib/Earthling/Survey/Question.class.php';
+require_once(__DIR__ . '/../lib/autoloader.inc.php');
+
+if (empty($_REQUEST['question'])){
+	die(json_encode(['error'=>'No question specified'));
+}
 
 $question = new Earthling\Survey\Question($_REQUEST['question']);
 
-$assert_question_row = Earthling\Survey\Question::FetchQuestionFromAnswerId($_REQUEST['answer']);
 
 if (!$question->isValid()) {
 	die(json_encode(['error' => 'Invalid question']));
-}
-
-if ($question->getId() != $assert_question_row['id']) {
-	die(json_encode(['error' => 'Invalid question. Does not match answer']));
 }
 
 $already_voted = false;
@@ -38,6 +38,13 @@ if (isset($_COOKIE['question_' . $question->getId()])) {
 $cookie_set = false;
 
 if ($DISABLE_COOKIE_CHECK || !$already_voted) {
+
+	$assert_question_row = Earthling\Survey\QuestionsUtil::FetchQuestionFromAnswerId($_REQUEST['answer']);
+
+	if ($question->getId() != $assert_question_row['id']) {
+		die(json_encode(['error' => 'Invalid question. Does not match answer']));
+	}
+
 	$answer_added = $question->addUserAnswer($_REQUEST['answer']);
 
 	if ($answer_added) {

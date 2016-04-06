@@ -1,3 +1,5 @@
+-- Run these create statements inside of Sqlite --
+
 -- ------------------------------------------------------------------------
 -- This table is meant for all the questions in the database
 -- ------------------------------------------------------------------------

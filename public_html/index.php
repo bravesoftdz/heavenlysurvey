@@ -16,11 +16,12 @@
  *  2) Hide the submit button,
  *  3) Ajax the page to grab the results.
  */
-require_once __DIR__ . '/../lib/Earthling/Survey/Question.class.php';
+require_once(__DIR__.'/../lib/autoloader.inc.php');
+
 $ERROR_MSG = false;
-$question = new Earthling\Survey\Question();
+$question = new Earthling\Survey\Question(isset($_GET['q']) ? $_GET['q'] : null);
 if ($question->getId() == null) {
-	$ERROR_MSG = 'There are no survey questions';
+	$ERROR_MSG = 'There are either no survey qustions or there is not a survey question by this id.';
 }
 $answers = $question->fetchAnswers();
 
@@ -30,7 +31,11 @@ if (empty($_COOKIE['question_' . $question->getId()])) {
 		'viewed-not-voted',
 		time() + (10 * 365 * 24 * 60 * 60)
 	);
+	$user_answer = null;
+}else{
+	$user_answer = $_COOKIE['question_' . $question->getId()];
 }
+
 ?>
 <!doctype html>
 <html>
@@ -38,9 +43,10 @@ if (empty($_COOKIE['question_' . $question->getId()])) {
         <meta charset="utf-8">
         <meta name="description" content="Survey a user and keep track of their choice">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Survey</title>
+        <title><?=$question->getText()?> - Earthling Survey</title>
         <link rel="stylesheet" href="css/styles.css">
         <link rel="author" href="humans.txt">
+        <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
     </head>
     <body class="parent">
     	<div class="child">
@@ -60,7 +66,14 @@ if (empty($_COOKIE['question_' . $question->getId()])) {
 					<?php foreach ($answers as $answer): ?>
 						<div class="answer">
 						    <label><input type="radio" name="answer" value="<?=$answer['id']?>" /><?=htmlentities($answer['answer_text'])?></label>
-						    <div class="result" id="answer_result_<?=$answer['id']?>"><span class="percent-graph"><span class="bar"></span></span><span class="stats">(<span class="percent"></span>, <span class="number"></span>)</span></div>
+						    <div class="result <?=$user_answer == $answer['id'] ? 'voted' : ''?>" id="answer_result_<?=$answer['id']?>" ><span class="percent-graph" title="Percent of voters for this choice"><span class="bar"></span></span><span class="stats">(<span class="percent"></span>, <span class="number"></span>)</span></div>
+						<?php if ($user_answer == $answer['id']):?>
+							<script>
+							$(function(){
+								ajax_vote_or_refresh('question=<?=$question->getId()?>');
+							});
+							</script>
+						<?php endif; ?>
 						</div>
 					<?php endforeach;?>
 					</div>
@@ -72,7 +85,7 @@ if (empty($_COOKIE['question_' . $question->getId()])) {
 		    </section>
 			<?php endif;?>
 		</div>
-		<script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
+		
         <script src="js/main.js"></script>
     </body>
 </html>

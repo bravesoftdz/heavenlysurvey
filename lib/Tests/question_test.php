@@ -1,7 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Earthling/Survey/Question.class.php';
-require_once __DIR__ . '/../Earthling/Survey/QuestionsUtil.class.php';
+require_once __DIR__ . '/../autoloader.inc.php';
 
 $qid = Earthling\Survey\QuestionsUtil::AdminAdd('Rate your front-end experience:');
 

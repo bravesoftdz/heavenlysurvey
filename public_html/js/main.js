@@ -21,6 +21,22 @@ function show_poll_results(stats){
 	$('button[type=submit]').hide();
 }
 
+
+function ajax_vote_or_refresh(buildStr){
+	 $.ajax({
+      type: "GET",
+      url: "ajax_vote.php",
+      dataType: "json",
+      data: buildStr
+    }).done(function( msg ) {
+         if (msg.error){
+         	alert(msg.error);
+         }else{
+         	show_poll_results(msg.stats);
+         }  
+    });  
+}
+
 $('form.frmSurvey').submit(function(event){
 	var values = $(this).serializeArray();
 	var hasAnswer = false;
@@ -33,6 +49,7 @@ $('form.frmSurvey').submit(function(event){
 		if (obj.name == 'answer'){
 			hasAnswer = true;
 			buildStr += 'answer='+encodeURIComponent(obj.value);
+			$('#answer_result_'+obj.value).addClass('voted');
 		}else if (obj.name == 'question_id'){
 			buildStr += 'question='+encodeURIComponent(obj.value);
 		}
@@ -43,18 +60,7 @@ $('form.frmSurvey').submit(function(event){
     	return false;
     }
 
-    $.ajax({
-      type: "GET",
-      url: "ajax/submit_vote.php",
-      dataType: "json",
-      data: buildStr
-    }).done(function( msg ) {
-         if (msg.error){
-         	alert(msg.error);
-         }else{
-         	show_poll_results(msg.stats);
-         }  
-    });  
+    ajax_vote_or_refresh(buildStr);
 
 	event.preventDefault();
 });

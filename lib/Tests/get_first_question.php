@@ -1,4 +1,8 @@
 <?php
+/**
+ * This test will grab the first question in the database and show the answers
+ */
+
 require_once __DIR__ . '/../Earthling/Survey/Question.class.php';
 
 $question = new Earthling\Survey\Question();

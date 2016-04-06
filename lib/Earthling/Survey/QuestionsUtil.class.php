@@ -1,13 +1,19 @@
 <?php
-
 namespace Earthling\Survey;
 
-require_once __DIR__ . '/../../db.class.php';
-
+/**
+ * This class contains utility functions for all questions.
+ *
+ * Methods in here are better here than in the Questions class.
+ * Encapsulate all these static methods to deal with as a utility class
+ * for survey questions.
+ */
 class QuestionsUtil {
 
-	//Static Utility Funcitons
-
+	/**
+	 * Delete all questions and answers
+	 * @return bool the result of the 2 sql pdo delete statements
+	 */
 	public static function AdminDeleteAll() {
 		$prep = \db::pdo()->prepare('DELETE FROM questions ');
 		$res1 = $prep->execute(array());
@@ -19,6 +25,8 @@ class QuestionsUtil {
 
 	/**
 	 * Add a question to the database
+	 * @param string $question_text the question text which to add
+	 * @return boolean|int false if question already exists, otherwise last question id inserted
 	 */
 	public static function AdminAdd($question_text) {
 		if (self::FetchByText($question_text)) {
@@ -31,6 +39,8 @@ class QuestionsUtil {
 
 	/**
 	 * Fetch a given question by the question text
+	 * @param string $question_text the question text which to find a question by
+	 * @return array|boolean associative array of the question or false on failure
 	 */
 	public static function FetchByText($question_text) {
 		try {
@@ -46,6 +56,8 @@ class QuestionsUtil {
 
 	/**
 	 * Find the question from the answer id, good to verify that the answer is actually a part of the question
+	 * @param integer $answer_id a particular answer id (each one is unique)
+	 * @return array|boolean associative array of the question or false if an error with the pdo or sql statements
 	 */
 	public static function FetchQuestionFromAnswerId($answer_id) {
 		try {

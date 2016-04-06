@@ -1,58 +1,20 @@
 <?php
-
 namespace Earthling\Survey;
 
-require_once __DIR__ . '/QuestionsUtil.class.php';
+require_once(__DIR__ . '/QuestionsUtil.class.php');
 
-require_once __DIR__ . '/../../db.class.php';
-
+/**
+ * This class is the main model for handling questions and answers to the specific
+ * quesiton.
+ */
 class Question {
-	private $id = null;
-	private $last_error = null;
-	private $row = null;
-
-	/**
-	 * Get the id of the current question
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	public function isValid() {
-		return !is_null($this->id);
-	}
-
-	public function getText() {
-		if (isset($this->row['question_text'])) {
-			return $this->row['question_text'];
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Retreive the last error if there is one
-	 */
-	public function getLastError() {
-		return $this->last_error;
-	}
-
-	/**
-	 * Construct the question with given id,
-	 * if it is null, just construct with first question
-	 * in the database.
-	 */
-	public function __construct($id = null) {
-		$this->row = $this->fetch($id);
-		if (!empty($this->row)) {
-			$this->id = $this->row['id'];
-		}
-	}
 
 	/**
 	 * Fetch a given question row
+	 * @param int|null question id to fetch or null if fetching first one
+	 * @return array|boolean associative array of the question found or false if pdo sql error
 	 */
-	public function fetch($question_id = null) {
+	public static function Fetch($question_id = null) {
 		try {
 			$sql = 'SELECT id, question_text FROM questions';
 			$ary = array();
@@ -69,13 +31,67 @@ class Question {
 			return $prep->fetch(\PDO::FETCH_ASSOC);
 
 		} catch (PDOException $e) {
-			$this->last_error = $e->getMessage();
+			//last_error = $e->getMessage();
+			return false;
+		}
+	}
+
+	private $id = null;
+	private $last_error = null;
+	private $row = null;
+
+	/**
+	 * Get the id of the current question
+	 * @return int|null the id of the question or null if doesn't exist.
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+	/**
+	 * Determine if this question is valid
+	 * @return boolean true if a valid question and id exists, false otherwise
+	 */
+	public function isValid() {
+		return !is_null($this->id);
+	}
+
+	/**
+	 * Get question text
+	 * @return string|boolean question text if it exists, otherwise if invalid, return false
+	 */
+	public function getText() {
+		if (isset($this->row['question_text'])) {
+			return $this->row['question_text'];
+		} else {
 			return false;
 		}
 	}
 
 	/**
+	 * Retreive the last error if there is one
+	 * @return string|null last error or null if no last error
+	 */
+	public function getLastError() {
+		return $this->last_error;
+	}
+
+	/**
+	 * Construct the question with given id,
+	 * if it is null, just construct with first question
+	 * in the database.
+	 * @param int|null id of the question or null if we want to get first question
+	 */
+	public function __construct($id = null) {
+		$this->row = self::Fetch($id);
+		if (!empty($this->row)) {
+			$this->id = $this->row['id'];
+		}
+	}
+
+	/**
 	 * Grab all the answers from this specific question
+	 * @return array|boolean an array of answer associative arrays or false if pdo sql failure
 	 */
 	public function fetchAnswers() {
 		try {
@@ -91,6 +107,7 @@ class Question {
 
 	/**
 	 * Get user answer statistics
+	 * @return array all the statistics of each question the number of votes and the percent of each answer
 	 */
 	public function userAnswerStatistics() {
 		$answers = $this->fetchAnswers();
@@ -120,6 +137,8 @@ class Question {
 
 	/**
 	 * Add an answer to this question
+	 * @param string $answer_text the text of the answer to add to the question
+	 * @param int $sort_order the sort order of where the answer should appear
 	 */
 	public function adminAddAnswer($answer_text, $sort_order = 1) {
 		$prep = \db::pdo()->prepare('INSERT INTO answers (sort_order, answer_text, question_id) VALUES(:sort_order, :answer_text, :question_id) ');
@@ -129,6 +148,7 @@ class Question {
 
 	/**
 	 * Delete all answers from this particular question
+	 * @return boolean result of delete of all answers
 	 */
 	public function adminDeleteAllAnswers() {
 		$prep = \db::pdo()->prepare('DELETE FROM answers WHERE question_id = :qid');
@@ -138,6 +158,10 @@ class Question {
 
 	/**
 	 * Append a user answer to the survey
+	 * @param int $answer_id the answer id of the specific question
+	 * @param string $ip remote ip address of user being added
+	 * @param string $user_agent the user agent/browser of the user
+	 * @return boolean true if executed properly, false on failure or no question found
 	 */
 	public function addUserAnswer($answer_id, $ip = null, $user_agent = null) {
 		try {
