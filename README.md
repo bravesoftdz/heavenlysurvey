@@ -1,4 +1,3 @@
-Code Exercise
 Overview:
 --------------------------------------
 Create a one page web application that shows a survey question with possible answers.  After the question is answered then results will be displayed.
