@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../Earthling/Survey/Question.class.php';
+require_once __DIR__ . '/../Heavenling/Survey/Question.class.php';
 
-$question = new Earthling\Survey\Question();
+$question = new Heavenling\Survey\Question();
 
 echo $question->getId() . ' ' . $question->getText() . "\n";
 

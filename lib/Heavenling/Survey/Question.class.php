@@ -1,5 +1,5 @@
 <?php
-namespace Earthling\Survey;
+namespace Heavenling\Survey;
 
 require_once(__DIR__ . '/QuestionsUtil.class.php');
 

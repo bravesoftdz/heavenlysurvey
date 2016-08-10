@@ -1,5 +1,5 @@
 <?php
-namespace Earthling\Survey;
+namespace Heavenling\Survey;
 
 /**
  * This class contains utility functions for all questions.

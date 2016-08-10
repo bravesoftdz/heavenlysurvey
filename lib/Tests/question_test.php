@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../autoloader.inc.php';
 
-$qid = Earthling\Survey\QuestionsUtil::AdminAdd('Rate your front-end experience:');
+$qid = Heavenling\Survey\QuestionsUtil::AdminAdd('Rate your front-end experience:');
 
 if ($qid === false) {
 	echo 'Question already added, aborting test';
@@ -11,7 +11,7 @@ if ($qid === false) {
 
 var_dump($qid);
 
-$question = new Earthling\Survey\Question($qid);
+$question = new Heavenling\Survey\Question($qid);
 
 $question->adminAddAnswer('0/5', 1);
 $question->adminAddAnswer('1/5', 2);

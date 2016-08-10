@@ -19,7 +19,7 @@
 require_once(__DIR__.'/../lib/autoloader.inc.php');
 
 $ERROR_MSG = false;
-$question = new Earthling\Survey\Question(isset($_GET['q']) ? $_GET['q'] : null);
+$question = new Heavenling\Survey\Question(isset($_GET['q']) ? $_GET['q'] : null);
 if ($question->getId() == null) {
 	$ERROR_MSG = 'There are either no survey qustions or there is not a survey question by this id.';
 }
@@ -43,14 +43,14 @@ if (empty($_COOKIE['question_' . $question->getId()])) {
         <meta charset="utf-8">
         <meta name="description" content="Survey a user and keep track of their choice">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?=$question->getText()?> - Earthling Survey</title>
+        <title><?=$question->getText()?> - Heavenling Survey</title>
         <link rel="stylesheet" href="css/styles.css">
         <link rel="author" href="humans.txt">
         <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
     </head>
     <body class="parent">
     	<div class="child">
-	    	<h1>Earthling Survey</h1>
+	    	<h1>Heavenling Survey</h1>
 	    	<?php if ($ERROR_MSG): ?>
 				<div class="error box">
 				<?=$ERROR_MSG?>

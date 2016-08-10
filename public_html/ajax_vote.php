@@ -15,7 +15,7 @@ if (empty($_REQUEST['question'])){
 	die(json_encode(['error'=>'No question specified']));
 }
 
-$question = new Earthling\Survey\Question($_REQUEST['question']);
+$question = new Heavenling\Survey\Question($_REQUEST['question']);
 
 
 if (!$question->isValid()) {
@@ -39,7 +39,7 @@ $cookie_set = false;
 
 if ($DISABLE_COOKIE_CHECK || !$already_voted) {
 
-	$assert_question_row = Earthling\Survey\QuestionsUtil::FetchQuestionFromAnswerId($_REQUEST['answer']);
+	$assert_question_row = Heavenling\Survey\QuestionsUtil::FetchQuestionFromAnswerId($_REQUEST['answer']);
 
 	if ($question->getId() != $assert_question_row['id']) {
 		die(json_encode(['error' => 'Invalid question. Does not match answer']));

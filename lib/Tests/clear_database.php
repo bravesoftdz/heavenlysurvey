@@ -4,4 +4,4 @@
  */
 require_once __DIR__ . '/../autoloader.inc.php';
 
-Earthling\Survey\QuestionsUtil::AdminDeleteAll();
+Heavenling\Survey\QuestionsUtil::AdminDeleteAll();
